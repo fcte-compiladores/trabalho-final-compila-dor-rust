@@ -1,0 +1,51 @@
+1 + 2 * (3 - 4)
+"Hello World"
+obj.atributo
+obj.atributo.sub_atributo
+clock()
+sqrt(9)
+f(x, y)
+obj.method()
+create_incrementer(2)(40)
+!true
+!false
+-5
+-(-5)
+!(-5)
+1 and 0
+0 and 1
+1 or 0
+0 or 1
+0 and (1 / 0)
+1 or (1 / 0)
+x = 10
+y = x + 5
+x
+y
+x = 42
+x
+var a = 10
+var b = 20
+var c
+a
+b
+c
+var d = a + b
+d
+{ var x = 10; var y = 20; x + y }
+{ var a = 5; var b = 3; a * b }
+{ 1 + 2; 3 + 4; 5 + 6 }
+if (true) 42 else 24
+if (false) 42 else 24
+if (1) 10 else 20
+if (0) 10 else 20
+if (true) 100
+if (false) 100
+if (1 + 2 > 3) 10 else 20
+if (3 > 2) 30 else 40
+if (true) { var x = 10; x }
+if (false) { var x = 10; x } else { var y = 20; y }
+while (false) 42
+var i = 0; while (i < 3) { i = i + 1; i }
+var count = 0; while (count < 5) { count = count + 1; count }
+var x = 1; while (x < 10) { x = x * 2; x }
