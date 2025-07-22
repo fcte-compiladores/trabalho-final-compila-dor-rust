@@ -53,17 +53,13 @@ var x = 1; while (x < 10) { x = x * 2; x }
 
 
 // Calculation of GCD using Euclidean algorithm
-var a = 15;
-var b = 12;
+var a = 59;
+var b = 89;
 
-while (b != 0) {
-  var temp = b;
-  b = a % b;
-  a = temp;
-  print(a);
-  print(b);
-}
+{ print(a); }
 
-print(a);
+while (b != 0) { var temp = b; b = a % b; a = temp; print(a);}
+
+{ print(a); }
 
 
