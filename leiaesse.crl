@@ -49,3 +49,21 @@ while (false) 42
 var i = 0; while (i < 3) { i = i + 1; i }
 var count = 0; while (count < 5) { count = count + 1; count }
 var x = 1; while (x < 10) { x = x * 2; x }
+15 % 12;
+
+
+// Calculation of GCD using Euclidean algorithm
+var a = 15;
+var b = 12;
+
+while (b != 0) {
+  var temp = b;
+  b = a % b;
+  a = temp;
+  print(a);
+  print(b);
+}
+
+print(a);
+
+

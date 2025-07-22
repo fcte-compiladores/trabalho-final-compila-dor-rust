@@ -142,6 +142,11 @@ impl Analisador {
         match self.ver() {
             Some(Simbolo::Var) => self.analisar_declaracao_variavel(),
             Some(Simbolo::AbreChaves) => self.analisar_bloco(),
+            Some(Simbolo::Print) => {
+                self.avancar(); // consome o print
+                let expr = self.analisar_expressao()?;
+                Some(Expr::Print(Box::new(expr)))
+            }
             _ => self.analisar_atribuicao(),
         }
     }
@@ -168,7 +173,7 @@ impl Analisador {
             Some(Expr::VarDef(nome, Box::new(valor)))
         } else {
             // Se não há inicialização, trata como var variavel = nil
-            Some(Expr::VarDef(nome, Box::new(Expr::Numero(0.0)))) // nil = 0.0 para simplificar
+            Some(Expr::VarDef(nome, Box::new(Expr::NumeroFloat(0.0)))) // nil = 0.0 para simplificar
         }
     }
 
@@ -301,6 +306,11 @@ impl Analisador {
                     let direito = self.analisar_atributo()?;
                     expr = Expr::Divisao(Box::new(expr), Box::new(direito));
                 }
+                Simbolo::Modulo => {
+                    self.avancar();
+                    let direito = self.analisar_atributo()?;
+                    expr = Expr::Modulo(Box::new(expr), Box::new(direito));
+                }
                 _ => break,
             }
         }
@@ -320,10 +330,15 @@ impl Analisador {
                 let expr = self.analisar_unario()?;
                 Some(Expr::NegacaoAritmetica(Box::new(expr)))
             }
-            Simbolo::Numero(n) => {
+            Simbolo::NumeroInteiro(n) => {
                 let valor = *n;
                 self.avancar();
-                Some(Expr::Numero(valor))
+                Some(Expr::NumeroInteiro(valor))
+            }
+            Simbolo::NumeroFloat(n) => {
+                let valor = *n;
+                self.avancar();
+                Some(Expr::NumeroFloat(valor))
             }
             Simbolo::String(s) => {
                 let valor = s.clone();

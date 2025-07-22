@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub enum Expr {
-    Numero(f64),
+    NumeroInteiro(i64),
+    NumeroFloat(f64),
     String(String),
     Identificador(String),
     Assign(String, Box<Expr>),
@@ -20,19 +21,22 @@ pub enum Expr {
     Subtracao(Box<Expr>, Box<Expr>),
     Multiplicacao(Box<Expr>, Box<Expr>),
     Divisao(Box<Expr>, Box<Expr>),
+    Modulo(Box<Expr>, Box<Expr>),
     Maior(Box<Expr>, Box<Expr>),
     Menor(Box<Expr>, Box<Expr>),
     MaiorIgual(Box<Expr>, Box<Expr>),
     MenorIgual(Box<Expr>, Box<Expr>),
     IgualIgual(Box<Expr>, Box<Expr>),
     Diferente(Box<Expr>, Box<Expr>),
+    Print(Box<Expr>), // Para a instrução print
     // Para contexto/escopo HashTable RC(Reference Count) - Celula
 }
 
 impl Expr {
     pub fn avaliar_com_contexto(&self, ctx: &mut HashMap<String, f64>) -> f64 {
         match self {
-            Expr::Numero(n) => *n,
+            Expr::NumeroInteiro(n) => *n as f64,
+            Expr::NumeroFloat(n) => *n,
             Expr::String(_) => 0.0,
             Expr::Identificador(nome) => {
                 match nome.as_str() {
@@ -112,6 +116,7 @@ impl Expr {
             Expr::Subtracao(esq, dir) => esq.avaliar_com_contexto(ctx) - dir.avaliar_com_contexto(ctx),
             Expr::Multiplicacao(esq, dir) => esq.avaliar_com_contexto(ctx) * dir.avaliar_com_contexto(ctx),
             Expr::Divisao(esq, dir) => esq.avaliar_com_contexto(ctx) / dir.avaliar_com_contexto(ctx),
+            Expr::Modulo(esq, dir) => esq.avaliar_com_contexto(ctx) % dir.avaliar_com_contexto(ctx),
             Expr::Maior(esq, dir) => {
                 if esq.avaliar_com_contexto(ctx) > dir.avaliar_com_contexto(ctx) { 1.0 } else { 0.0 }
             }
@@ -130,6 +135,11 @@ impl Expr {
             Expr::Diferente(esq, dir) => {
                 if esq.avaliar_com_contexto(ctx) != dir.avaliar_com_contexto(ctx) { 1.0 } else { 0.0 }
             }
+            Expr::Print(expr) => {
+                let valor = expr.avaliar_com_contexto(ctx);
+                println!("{}", valor);
+                valor
+            }
         }
     }
 
@@ -144,7 +154,8 @@ impl Expr {
     pub fn imprimir(&self, nivel: usize) {
         let indent = "   ".repeat(nivel);
         match self {
-            Expr::Numero(n) => println!("{}Número: {}", indent, n),
+            Expr::NumeroInteiro(n) => println!("{}Número Inteiro: {}", indent, n),
+            Expr::NumeroFloat(n) => println!("{}Número Float: {}", indent, n),
             Expr::String(s) => println!("{}String: \"{}\"", indent, s),
             Expr::Identificador(id) => println!("{}Identificador: {}", indent, id),
             Expr::Assign(nome, expr) => {
@@ -227,6 +238,11 @@ impl Expr {
                 esq.imprimir(nivel + 1);
                 dir.imprimir(nivel + 1);
             }
+            Expr::Modulo(esq, dir) => {
+                println!("{}Modulo:", indent);
+                esq.imprimir(nivel + 1);
+                dir.imprimir(nivel + 1);
+            }
             Expr::Maior(esq, dir) => {
                 println!("{}Maior (>):", indent);
                 esq.imprimir(nivel + 1);
@@ -256,6 +272,10 @@ impl Expr {
                 println!("{}Diferente (!=):", indent);
                 esq.imprimir(nivel + 1);
                 dir.imprimir(nivel + 1);
+            }
+            Expr::Print(expr) => {
+                println!("{}Print:", indent);
+                expr.imprimir(nivel + 1);
             }
         }
     }

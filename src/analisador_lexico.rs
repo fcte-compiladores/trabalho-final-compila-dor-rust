@@ -1,7 +1,8 @@
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Simbolo {
-    Numero(f64),
+    NumeroInteiro(i64),
+    NumeroFloat(f64),
     String(String),
     Identificador(String),
     Ponto,
@@ -16,6 +17,7 @@ pub enum Simbolo {
     Subtracao,         // - (pode ser unário ou binário)
     Multiplicacao,
     Divisao,
+    Modulo,            // %
     And,
     Or,
     Igual,             // =
@@ -29,6 +31,7 @@ pub enum Simbolo {
     If,                // if
     Else,              // else
     While,             // while
+    Print,             // print
     Fim,
 }
 
@@ -87,6 +90,7 @@ pub fn analisar(texto: &str) -> Vec<Simbolo> {
                     "if" => simbolos.push(Simbolo::If),
                     "else" => simbolos.push(Simbolo::Else),
                     "while" => simbolos.push(Simbolo::While),
+                    "print" => simbolos.push(Simbolo::Print),
                     _ => simbolos.push(Simbolo::Identificador(identificador)),
                 }
             }
@@ -95,35 +99,27 @@ pub fn analisar(texto: &str) -> Vec<Simbolo> {
                 simbolos.push(Simbolo::Ponto);
             }
             '0'..='9' => {
-                let mut numero = String::new();
-                let primeiro_digito = c;
-                // Regra do Lox: se começa com 0, só pode ser 0 ou 0.xxx
-                if primeiro_digito == '0' {
-                    numero.push(chars.next().unwrap());
-                    if let Some(&proximo) = chars.peek() {
-                        if proximo == '.' {
-                            numero.push(chars.next().unwrap());
-                            while let Some(&d) = chars.peek() {
-                                if d.is_ascii_digit() {
-                                    numero.push(d);
-                                    chars.next();
-                                } else {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    while let Some(&d) = chars.peek() {
-                        if d.is_ascii_digit() || d == '.' {
-                            numero.push(d);
-                            chars.next();
-                        } else {
-                            break;
-                        }
+                let mut numero_str = String::new();
+                let mut is_float = false;
+
+                while let Some(&d) = chars.peek() {
+                    if d.is_ascii_digit() {
+                        numero_str.push(d);
+                        chars.next();
+                    } else if d == '.' && !is_float {
+                        is_float = true;
+                        numero_str.push(d);
+                        chars.next();
+                    } else {
+                        break;
                     }
                 }
-                simbolos.push(Simbolo::Numero(numero.parse().unwrap()));
+
+                if is_float {
+                    simbolos.push(Simbolo::NumeroFloat(numero_str.parse().unwrap()));
+                } else {
+                    simbolos.push(Simbolo::NumeroInteiro(numero_str.parse().unwrap()));
+                }
             }
             '+' => {
                 chars.next();
@@ -140,6 +136,10 @@ pub fn analisar(texto: &str) -> Vec<Simbolo> {
             '/' => {
                 chars.next();
                 simbolos.push(Simbolo::Divisao);
+            }
+            '%' => {
+                chars.next();
+                simbolos.push(Simbolo::Modulo);
             }
             '(' => {
                 chars.next();
